@@ -918,3 +918,18 @@ body {
 .sidebar-footer a:hover {
   color: var(--accent-red);
 }
+
+/* --- Beta Badge --- */
+.beta-badge {
+  display: inline-block;
+  font-size: 0.55rem;
+  font-weight: 850;
+  color: var(--bg-secondary);
+  background-color: var(--accent-red);
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
