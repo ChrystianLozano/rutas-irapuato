@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Rutas de Irapuato</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Simulador de tránsito interactivo estilo Mini Motorways para rutas urbanas en Irapuato, Gto.">
+  <meta name="keywords" content="Mini Motorways, Irapuato, Ruta 3R, Ruta 02, Mapa Interactivo, Tránsito, Simulación, Diseño Plano">
+  <meta name="author" content="Antigravity Web App Studio">
+  
+  <!-- Leaflet.js Stylesheet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+        crossorigin="" />
+        
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Local Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark">
+
+  <!-- Sakura Petals Effect Container (Mini Motorways Easter Egg) -->
+  <div id="sakura-container" class="sakura-container" style="display: none;"></div>
+
+  <!-- Main Game Map Wrapper -->
+  <section class="map-wrapper" aria-label="Plano de Tránsito">
+    <div id="map"></div>
+  </section>
+
+  <!-- Floating Title Panel (Top-Left) -->
+  <header class="game-title-panel" id="title-panel">
+    <div class="motorways-icon" id="brand-icon" title="Tránsito de Irapuato"></div>
+    <div class="title-text-container">
+      <span class="game-subtitle">Mapa de Rutas de Irapuato</span>
+      <select id="route-selector" class="game-route-select pulse-selector" title="Seleccionar Ruta" aria-label="Selector de ruta">
+        <option value="" disabled selected>SELECCIONAR RUTA</option>
+        <option value="ruta01">Ruta 01</option>
+        <option value="ruta3r">Ruta 3R</option>
+        <option value="ruta02">Ruta 02</option>
+        <option value="ruta05">Ruta 05</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Floating Sidebar Panel (Itinerary & Stats) -->
+  <main class="floating-sidebar" id="sidebar-panel">
+    <!-- Route selection tabs (disabled initially) -->
+    <nav id="route-tabs" class="tab-container hud-disabled" role="tablist" aria-label="Sentido de la Ruta">
+      <button id="tab-salida" class="tab-btn active" data-route="salida" role="tab" aria-selected="true">
+        <span class="tab-indicator"></span>
+        <span>SALIDA</span>
+      </button>
+      <button id="tab-retorno" class="tab-btn" data-route="retorno" role="tab" aria-selected="false">
+        <span class="tab-indicator"></span>
+        <span>RETORNO</span>
+      </button>
+    </nav>
+    
+    <!-- Itinerary detail content -->
+    <div class="panel-content">
+      <!-- Welcome Panel (Shown initially) -->
+      <div id="welcome-panel" class="welcome-panel">
+        <div class="welcome-icon"><i class="fas fa-route"></i></div>
+        <h3>Mapa de Rutas de Irapuato</h3>
+        <p>Por favor, selecciona una ruta en el menú de la esquina superior izquierda para cargar la red vial y comenzar la simulación.</p>
+      </div>
+
+      <!-- Route Content Panel (Hidden initially) -->
+      <div id="route-content-panel" style="display: none;">
+        <!-- Quick Info Stats -->
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span id="stat-distance" class="stat-val">0</span>
+            <span class="stat-unit">KM</span>
+          </div>
+          <div class="stat-item">
+            <span id="stat-stops" class="stat-val">0</span>
+            <span class="stat-unit">PARADAS</span>
+          </div>
+          <div class="stat-item">
+            <span id="stat-time" class="stat-val">0</span>
+            <span class="stat-unit">MIN</span>
+          </div>
+        </div>
+        
+        <div style="height: 15px;"></div>
+        
+        <!-- Itinerary List -->
+        <div id="itinerary-list" class="itinerary-list route-salida" role="list">
+          <!-- Rendered dynamically in app.js -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Floating Game HUD Container (Top-Right) -->
+  <section class="game-hud-container" aria-label="Controles del Juego">
+    
+    <!-- Passengers score panel (disabled initially) -->
+    <div class="score-panel hud-disabled" id="score-panel" title="Pasajeros Transportados">
+      <span class="score-pin" id="score-pin">📍</span>
+      <span class="score-value" id="score-value">0</span>
+    </div>
+    
+    <!-- Simulation / Time controls (disabled initially) -->
+    <div class="time-controls hud-disabled" id="sim-time-controls" role="toolbar" aria-label="Controles de Simulación">
+      <div class="clock-widget paused" id="clock-widget" title="Reloj de Simulación"></div>
+      
+      <button class="hud-btn active" id="btn-pause" title="Pausar Simulación" aria-label="Pausar simulación">
+        <i class="fas fa-pause"></i>
+      </button>
+      <button class="hud-btn" id="btn-play" title="Velocidad Normal x1" aria-label="Velocidad normal">
+        <i class="fas fa-play"></i>
+      </button>
+      <button class="hud-btn" id="btn-fast" title="Velocidad Rápida x2" aria-label="Velocidad rápida">
+        <i class="fas fa-forward"></i>
+      </button>
+    </div>
+    
+  </section>
+
+  <!-- Floating Utilities Controls (Bottom-Right) -->
+  <section class="bottom-controls" aria-label="Utilidades">
+    <!-- Re-center network view -->
+    <button id="btn-recenter" class="hud-circle-btn" title="Centrar Mapa" aria-label="Centrar mapa">
+      <i class="fas fa-crosshairs"></i>
+    </button>
+    
+    <!-- Sakura Easter Egg Toggle -->
+    <button id="btn-sakura-toggle" class="hud-circle-btn" title="Alternar Pétalos de Sakura" aria-label="Alternar sakura">
+      <i class="fas fa-leaf"></i>
+    </button>
+    
+    <!-- Theme Toggle (Day/Night Theme Swap) -->
+    <button id="theme-toggle" class="hud-circle-btn" title="Alternar Modo Día/Noche" aria-label="Alternar tema claro u oscuro">
+      <i class="fas fa-moon"></i>
+    </button>
+  </section>
+
+  <!-- Leaflet.js Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+          crossorigin=""></script>
+          
+  <!-- Main Game logic -->
+  <script src="app.js"></script>
+</body>
+</html>
