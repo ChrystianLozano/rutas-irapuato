@@ -933,3 +933,29 @@ body {
   letter-spacing: 0.5px;
   line-height: 1;
 }
+
+/* --- Construction Notice Banner --- */
+.construction-notice {
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 16px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.4;
+  border-left: 4px solid var(--accent-red);
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.construction-notice i {
+  color: var(--accent-red);
+  font-size: 0.9rem;
+}
+
+[data-theme="light"] .construction-notice {
+  background-color: var(--bg-tertiary);
+}
+
