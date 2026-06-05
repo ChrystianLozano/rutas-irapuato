@@ -9,6 +9,7 @@ Thumbs.db
 
 # Developer Agent configs
 .agents/
+.kml/
 
 # IDEs/Editors configs
 .vscode/
@@ -18,6 +19,7 @@ Thumbs.db
 *.njsproj
 *.sln
 *.swp
+.kml/
 
 # Log files
 *.log
